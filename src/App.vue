@@ -5,7 +5,6 @@
       {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
     </button>
 
-    <!-- Input -->
     <div class="input-container">
       <input v-model="newTaskName" placeholder="Nama Tugas..." />
       <input v-model="newTaskDesc" placeholder="Deskripsi Tugas..." />
@@ -18,7 +17,6 @@
       <button @click="addTask">Tambah</button>
     </div>
 
-    <!-- Filter & Sort -->
     <div class="filter-container">
       <button :class="{ active: filter === 'all' }" @click="setFilter('all')">Semua</button>
       <button :class="{ active: filter === 'unfinished' }" @click="setFilter('unfinished')">Belum Selesai</button>
@@ -28,12 +26,10 @@
       <button @click="clearDateFilter">Reset Tanggal</button>
     </div>
 
-    <!-- List Tugas -->
     <div class="list-container">
       <div class="task-item" v-for="(task, index) in filteredTasks" :key="index">
         <div class="task-left">
           <div class="task-info">
-            <!-- Edit langsung Nama, Deskripsi, Prioritas, dan Waktu -->
             <input v-if="task.isEditing" v-model="task.name" class="edit-input" />
             <strong v-else :class="{ done: task.done }">{{ task.name }}</strong>
             
@@ -79,7 +75,6 @@ const filter = ref('all')
 const sortOrder = ref('desc')
 const prioritySortOrder = ref('desc') // 'asc' or 'desc'
 
-// Tambah tugas
 const addTask = () => {
   if (newTaskName.value.trim() !== '' && newTime.value !== '') {
     tasks.value.push({
@@ -89,7 +84,6 @@ const addTask = () => {
       done: false,
       startTime: newTime.value,
       endTime: null,
-      isEditing: false // Indikator untuk mode edit
     })
     resetInputFields()
   }
@@ -117,22 +111,20 @@ const togglePrioritySort = () => {
 const filteredTasks = computed(() => {
   let result = tasks.value
 
-  // Filter status
   if (filter.value === 'unfinished') {
     result = result.filter(task => !task.done)
   } else if (filter.value === 'done') {
     result = result.filter(task => task.done)
   }
 
-  // Filter berdasarkan tanggal (jika dipilih)
   if (selectedDate.value) {
-    result = result.filter(task => {
-      const taskDate = new Date(task.startTime).toISOString().slice(0, 10)
-      return taskDate === selectedDate.value
-    })
-  }
+  result = result.filter(task => {
+    const taskDateObj = new Date(task.startTime)
+    const taskDate = `${taskDateObj.getFullYear()}-${(taskDateObj.getMonth()+1).toString().padStart(2, '0')}-${taskDateObj.getDate().toString().padStart(2, '0')}`
+    return taskDate === selectedDate.value
+  })
+}
 
-  // Sorting berdasarkan prioritas
   const priorityWeight = { 'High': 3, 'Medium': 2, 'Low': 1 }
   result = result.slice().sort((a, b) => {
     if (prioritySortOrder.value === 'desc') {
@@ -163,7 +155,6 @@ const removeTask = (index) => {
 }
 
 const toggleEditMode = (task) => {
-  // Toggle mode edit, memungkinkan untuk mengedit nama, deskripsi, prioritas, dan waktu
   task.isEditing = !task.isEditing
 }
 
@@ -181,7 +172,6 @@ const toggleDarkMode = () => {
 </script>
 
 <style>
-/* Default Light Mode */
 body {
   background-color: #f9fafb;
   font-family: 'Segoe UI', sans-serif;
@@ -191,13 +181,11 @@ body {
   color: #1f2937;
 }
 
-/* Dark Mode */
 body.dark-mode {
   background-color: #1f2937;
   color: #f3f4f6;
 }
 
-/* Main container style untuk Light & Dark */
 .main-container {
   position: fixed;
   top: 50%;
@@ -214,13 +202,12 @@ body.dark-mode {
   max-height: 90vh;
 }
 
-/* Dark Mode untuk main-container */
 body.dark-mode .main-container {
   background: #374151;
   color: #f9fafb;
 }
 
-/* Dark mode tombol toggle */
+
 .mode-toggle {
   margin-bottom: 16px;
   padding: 10px 16px;
@@ -235,7 +222,6 @@ body.dark-mode .main-container {
   background-color: #2563eb;
 }
 
-/* Dark mode form elemen */
 body.dark-mode input,
 body.dark-mode select,
 body.dark-mode textarea {
@@ -266,7 +252,6 @@ body.dark-mode .edit-input {
 h1 {
   font-size: 28px;
   margin-bottom: 20px;
-  /* color: #111827; */
 }
 
 .input-container {
@@ -348,7 +333,6 @@ h1 {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
 }
 
-/* Warna teks list tugas Light Mode */
 .task-info strong {
   font-size: 16px;
   color: #111827;
@@ -371,7 +355,6 @@ h1 {
   color: #111827;
 }
 
-/* Warna teks list tugas Dark Mode */
 body.dark-mode .task-info strong {
   color: #f9fafb;
 }
